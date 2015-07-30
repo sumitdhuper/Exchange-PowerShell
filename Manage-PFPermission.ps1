@@ -19,7 +19,7 @@ Else
 $PF = Read-Host "Please enter the Public Folder path under All Public Folders including preceding '\' sign"
 Write-host
 
-$U = Read-Host "Please enter the user name identity or alias here (4x4)"
+$U = Read-Host "Please enter the user name identity or alias here"
 Write-host
 Write-host "Enter '1' for applying permission on subfolders and '2' for not applying permission on subfolders." -Fore Cyan
 Write-host "1. Yes" -Fore Cyan
