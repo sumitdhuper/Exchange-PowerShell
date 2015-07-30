@@ -14,7 +14,7 @@ Else
     Return
     End}
 Write-Host
-$user = Read-Host "Please enter user 4x4 or email address"
+$user = Read-Host "Please enter user Alias or email address"
 Write-Host
 $Email = (Get-Mailbox $user).PrimarySmtpAddress
 $db = (Get-Mailbox $user).database
