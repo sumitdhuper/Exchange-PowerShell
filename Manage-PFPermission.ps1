@@ -101,7 +101,7 @@ Else
 $PF = Read-Host "Please enter the Public Folder path under All Public Folders including preceding '\' sign"
 Write-host
 
-$U = Read-Host "Please enter the user name identity or alias here (4x4)"
+$U = Read-Host "Please enter the user name identity or alias here"
 Write-host
 
 Write-host "Below are the available options to remove permission on above mentioned Public Folder." -Fore DarkYellow
