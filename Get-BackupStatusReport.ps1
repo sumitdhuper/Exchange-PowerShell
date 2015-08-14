@@ -114,7 +114,7 @@ $smtpsettings = @{
 # SMTP Server Name
 #...................................
 
-$MailServer = "SIND042301.wsatkins.com"
+$MailServer = "smtp.example.net"
 
 #...................................
 # Logfile Strings
