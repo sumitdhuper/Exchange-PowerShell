@@ -86,7 +86,7 @@ V1.00, 18/08/2015 - Initial version
 param (
 	[Parameter( 
         Position=0,
-        Mandatory=$true,
+        Mandatory=$false,
         ValueFromPipeline=$true,
         ValueFromPipelineByPropertyName=$true)]
 	[string]$Mailbox,
@@ -250,7 +250,10 @@ if ($Log) {Write-Logfile $initstring10}
 Return
 End
   }
-  default{Write-Host "ERROR: Mailbox Feature to Enable has not been selected!!!" -BackgroundColor black -ForegroundColor Yellow}
+  default{Write-Warning "Mailbox Feature to Enable has not been selected!!!"
+Return
+End
+  }
 }
 }
 
@@ -311,7 +314,10 @@ if ($Log) {Write-Logfile $initstring16}
 Return
 End
   }
-  default{Write-Host "ERROR: Mailbox Feature to Disable has not been selected!!!" -BackgroundColor black -ForegroundColor Yellow}
+  default{Write-Warning "Mailbox Feature to Disable has not been selected!!!"
+Return
+End
+  }
 }
 }
 
@@ -343,31 +349,8 @@ if ($Log) {Write-Logfile $initstring2}
 # Script
 #...................................
 
-If($EnableFeature){
-Switch($EnableFeature){
-default{Enable
-if($Log) {
-	$timestamp = Get-Date -DisplayHint Time
-	"$timestamp $logstring0" | Out-File $logfile -Append
-	Write-Logfile $logstring1
-	Write-Logfile "  $now"
-	Write-Logfile $logstring0
-Return
-End
-}}}}
-
-If($DisableFeature){
-Switch($DisableFeature){
-default{Disable
-if($Log) {
-	$timestamp = Get-Date -DisplayHint Time
-	"$timestamp $logstring0" | Out-File $logfile -Append
-	Write-Logfile $logstring1
-	Write-Logfile "  $now"
-	Write-Logfile $logstring0
-Return
-End
-}}}}
+if(!$Mailbox)
+{Write-Warning "No Parameter has been provided. Script has been terminated."}
 
 If($Mailbox)
 {
@@ -433,8 +416,35 @@ Else
 {
 Write-Host "MAPI Access: Disabled"
 }
-
 }
+
+If($EnableFeature){
+Switch($EnableFeature){
+default{Enable
+if($Log) {
+	$timestamp = Get-Date -DisplayHint Time
+	"$timestamp $logstring0" | Out-File $logfile -Append
+	Write-Logfile $logstring1
+	Write-Logfile "  $now"
+	Write-Logfile $logstring0
+
+Return
+End
+}}}}
+
+If($DisableFeature){
+Switch($DisableFeature){
+default{Disable
+if($Log) {
+	$timestamp = Get-Date -DisplayHint Time
+	"$timestamp $logstring0" | Out-File $logfile -Append
+	Write-Logfile $logstring1
+	Write-Logfile "  $now"
+	Write-Logfile $logstring0
+Return
+End
+}}}}
+
 if ($Log) {
 	$timestamp = Get-Date -DisplayHint Time
 	"$timestamp $logstring0" | Out-File $logfile -Append
@@ -533,13 +543,19 @@ Write-host
 Switch( $call ){
   1{Enable}
   2{Disable}
+  default{Write-Warning "No Option has been selected. Script has been terminated."}
 }
 }
 
-Else
-{
-Write-Host "This Script has been completed." -ForegroundColor Green
+If($ActionRequired -eq 'N')
+{Write-Host "This Script has been completed." -ForegroundColor Green
+Return
+End
 }
+
+If($ActionRequired -ne 'Y')
+{Write-Warning "No Option has been selected. Script has been terminated."}
+
 }
 }
 
