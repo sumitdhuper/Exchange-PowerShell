@@ -1,38 +1,46 @@
 <#
 .SYNOPSIS
-Get-MBXInfo.ps1
+Get-MailboxInfo.ps1
 
 .DESCRIPTION 
 This script is used to get mailbox information comprising details from Get-Mailbox & Get-MailboxStatistics Cmdlet.
-You could use this script with MAILBOX parameter or without any parameter which would show text input prompt message to use this script.
+You could use this script with MAILBOX parameter or with PROMPT parameter which would show text input prompt messages to run this script.
 
 .OUTPUTS
-Display information about a given mailbox.
+Display information about a given mailbox and output to console.
 
-.PARAMETER MAILBOX
-The MAILBOX parameter could be used by administrator to bypass text input prompt message function of this script.
+.PARAMETER Mailbox
+The MAILBOX parameter could be used by administrator to display information about specified mailbox.
+
+.PARAMETER Prompt
+The PROMPT parameter could be used to run text input prompt messages to display information about specified mailbox.
 
 .PARAMETER Log
 Used to generate a log file for the script.
 
 .EXAMPLE
-Get-Help .\Get-MBXInfo.ps1 -Full
+Get-Help .\Get-MailboxInfo.ps1 -Full
 
 .EXAMPLE
-.\Get-MBXInfo.ps1
+.\Get-MailboxInfo.ps1 -Prompt
 Returns multiple text input prompt messages which could be helpful for helpdesk support staff.
 
 .EXAMPLE
-.\Get-MBXInfo.ps1 -Mailbox SAM999
-Returns information about a given mailbox when using Alias.
+.\Get-MailboxInfo.ps1 -Mailbox SAM999
+Returns information about a specified mailbox when using Alias.
 
 .EXAMPLE
-.\Get-MBXInfo.ps1 -Mailbox sumit.dhuper@example.net
-Returns information about a given mailbox when using Email Address.
+.\Get-MailboxInfo.ps1 -Mailbox sumit.dhuper@example.net
+Returns information about a specified mailbox when using Email Address.
 
 .EXAMPLE
-.\Get-MBXInfo.ps1 -Log
-Returns a report with a log file at the script file path.
+$Mailboxes = Get-Mailbox -Server MBXSRV01
+foreach ($Mailbox in $Mailboxes){.\Get-MailboxInfo.ps1 $Mailbox}
+Returns information about multiple mailbox when using foreach loop method.
+
+.EXAMPLE
+.\Get-MailboxInfo.ps1 -Mailbox SAM999 -Log
+Returns a report with a log file at the script file path when used with other parameters.
 
 .LINK
 https://
@@ -55,15 +63,23 @@ Find me on:
 
 Change Log:
 V1.00, 09/07/2015 - Initial version
-V1.01, 14/08/2005 - Added Mailbox Parameter which is optional, Added Log file generation function and updated color codes
+V1.01, 14/08/2015 - Added Mailbox Parameter which is mandatory, Added Log file generation function and updated color codes
+V1.02, 18/08/2015 - Added Prompt Parameter which is optional function enabled helpdesk admin to run script through text input prompts.
 #>
 
 #requires -version 2
 
 [CmdletBinding()]
 param (
-	[Parameter( Mandatory=$false)]
+	[Parameter( 
+        Position=0,
+        Mandatory=$false,
+        ValueFromPipeline=$true,
+        ValueFromPipelineByPropertyName=$true)]
 	[string]$Mailbox,
+
+	[Parameter( Mandatory=$false)]
+	[switch]$Prompt,
 
 	[Parameter( Mandatory=$false)]
 	[switch]$Log
@@ -95,6 +111,8 @@ $logstring1 = " $scriptname"
 
 $initstring0 = "Initializing..."
 $initstring1 = "Loading the Exchange Server PowerShell snapin..."
+$initstring2 = "Active Directory Scope has been set to Entire Forest..."
+$initstring3 = "ERROR: Please use available parameters (like '-Mailbox' or '-Prompt') to run this script."
 
 #Try Exchange 2007 snapin first
 
@@ -158,16 +176,19 @@ if ($Log) {
 	Write-Logfile $logstring0
 }
 
-Write-Host $initstring0
+Write-Verbose $initstring0
 if ($Log) {Write-Logfile $initstring0}
 
-Write-Host $initstring1
+Write-Verbose $initstring1
 if ($Log) {Write-Logfile $initstring1}
 
 
 #...................................
 # Script
 #...................................
+
+#Add dependencies
+Import-Module ActiveDirectory -ErrorAction STOP
 
 If($Mailbox)
 {
@@ -200,6 +221,8 @@ End
 
 }
 
+If($Prompt)
+{
 Write-Host "   This script will show the mailbox details for user's mailbox" -fore Yellow
 Write-Host "******************************************************************" -fore Yellow
 Write-Host
@@ -229,6 +252,8 @@ if ($quota -eq "true")
 
 Write-Host "Note: Mailbox Quota Limit is getting inherited from Database." -fore DarkBlue -back Cyan
 Write-Host "-----------------------------------------------------------" -fore Yellow
+Return
+End
 }
 
 Else
@@ -237,8 +262,10 @@ Else
 
 Write-Host "Note: Mailbox Quota Limit is applied on user's Mailbox." -fore DarkBlue -back Cyan
 Write-Host "-------------------------------------------------------" -fore Yellow
+Return
+End
 }
-
+}
 #...................................
 # End
 #...................................
@@ -250,3 +277,5 @@ if ($Log) {
 	Write-Logfile "  $now"
 	Write-Logfile $logstring0
 }
+
+Write-Host $initstring3 -ForegroundColor Yellow -BackgroundColor Black
