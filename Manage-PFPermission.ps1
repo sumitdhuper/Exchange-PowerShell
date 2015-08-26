@@ -18,39 +18,36 @@ Else
 
 $PF = Read-Host "Please enter the Public Folder path under All Public Folders including preceding '\' sign"
 Write-host
-
-$U = Read-Host "Please enter the user name identity or alias here"
+$U = Read-Host "Please enter the user Email Address or Alias here"
 Write-host
-Write-host "Enter '1' for applying permission on subfolders and '2' for not applying permission on subfolders." -Fore Cyan
-Write-host "1. Yes" -Fore Cyan
-Write-host "2. No" -Fore Cyan
-$subfolder = Read-Host "Please enter '1' or '2'..."
+Write-Host "Kindly confirm if you would like to apply permission including Subfolders [" -NoNewline; Write-Host "Y" -ForegroundColor Yellow -NoNewline; Write-Host "]Yes or [" -NoNewline; Write-Host "N" -ForegroundColor Yellow -NoNewline; Write-Host "]No"  -Fore Cyan -NoNewline;
+$subfolder = Read-Host " "
 
 if ($subfolder -eq "$null")
-{Write-Host "ERROR: Permission scope has not been selected!!!" -BackgroundColor black -ForegroundColor Yellow
+{Write-Host "ERROR: Permission scope has not been confirmed!!!" -BackgroundColor black -ForegroundColor Yellow
   Return
   End
   }
 
-
-Write-host
 Write-host "Below are the available options to apply permission on above mentioned Public Folder." -Fore DarkYellow
 Write-host "1. Author" -Fore DarkYellow
 Write-host "2. Reviewer" -Fore DarkYellow
-Write-host "3. PublishingEditor" -Fore DarkYellow
-Write-host "4. Editor" -Fore DarkYellow
-Write-host "5. Owner" -Fore DarkYellow
-$AR = Read-host "Please enter an option 1 to 5..."
+Write-host "3. PublishingAuthor" -Fore DarkYellow
+Write-host "4. PublishingEditor" -Fore DarkYellow
+Write-host "5. Editor" -Fore DarkYellow
+Write-host "6. Owner" -Fore DarkYellow
+$AR = Read-host "Please enter an option 1 to 6..."
 
 
-if ($subfolder -eq "1")
+if ($subfolder -eq "Y")
 {
 Switch( $AR ){
   1{Get-PublicFolder –Identity “$PF” –Recurse | Add-PublicFolderClientPermission –User "$U" –AccessRights "Author"}
   2{Get-PublicFolder –Identity “$PF” –Recurse | Add-PublicFolderClientPermission –User "$U" –AccessRights "Reviewer"}
-  3{Get-PublicFolder –Identity “$PF” –Recurse | Add-PublicFolderClientPermission –User "$U" –AccessRights "PublishingEditor"}
-  4{Get-PublicFolder –Identity “$PF” –Recurse | Add-PublicFolderClientPermission –User "$U" –AccessRights "Editor"}
-  5{Get-PublicFolder –Identity “$PF” –Recurse | Add-PublicFolderClientPermission –User "$U" –AccessRights "Owner"}
+  3{Get-PublicFolder –Identity “$PF” –Recurse | Add-PublicFolderClientPermission –User "$U" –AccessRights "PublishingAuthor"}
+  4{Get-PublicFolder –Identity “$PF” –Recurse | Add-PublicFolderClientPermission –User "$U" –AccessRights "PublishingEditor"}
+  5{Get-PublicFolder –Identity “$PF” –Recurse | Add-PublicFolderClientPermission –User "$U" –AccessRights "Editor"}
+  6{Get-PublicFolder –Identity “$PF” –Recurse | Add-PublicFolderClientPermission –User "$U" –AccessRights "Owner"}
   default{Write-Host "ERROR: Permission level has not been selected for the above mentioned public folder!!!" -BackgroundColor black -ForegroundColor Yellow
   Return
   End
@@ -59,14 +56,15 @@ Switch( $AR ){
 }
 }
 
-if ($subfolder -eq "2")
+if ($subfolder -eq "N")
 {
 Switch( $AR ){
   1{Get-PublicFolder –Identity “$PF” | Add-PublicFolderClientPermission –User "$U" –AccessRights "Author"}
   2{Get-PublicFolder –Identity “$PF” | Add-PublicFolderClientPermission –User "$U" –AccessRights "Reviewer"}
-  3{Get-PublicFolder –Identity “$PF” | Add-PublicFolderClientPermission –User "$U" –AccessRights "PublishingEditor"}
-  4{Get-PublicFolder –Identity “$PF” | Add-PublicFolderClientPermission –User "$U" –AccessRights "Editor"}
-  5{Get-PublicFolder –Identity “$PF” | Add-PublicFolderClientPermission –User "$U" –AccessRights "Owner"}
+  3{Get-PublicFolder –Identity “$PF” | Add-PublicFolderClientPermission –User "$U" –AccessRights "PublishingAuthor"}
+  4{Get-PublicFolder –Identity “$PF” | Add-PublicFolderClientPermission –User "$U" –AccessRights "PublishingEditor"}
+  5{Get-PublicFolder –Identity “$PF” | Add-PublicFolderClientPermission –User "$U" –AccessRights "Editor"}
+  6{Get-PublicFolder –Identity “$PF” | Add-PublicFolderClientPermission –User "$U" –AccessRights "Owner"}
   default{Write-Host "ERROR: Permission level has not been selected for the above mentioned public folder!!!" -BackgroundColor black -ForegroundColor Yellow
   Return
   End
@@ -100,45 +98,56 @@ Else
 
 $PF = Read-Host "Please enter the Public Folder path under All Public Folders including preceding '\' sign"
 Write-host
-
-$U = Read-Host "Please enter the user name identity or alias here"
+$U = Read-Host "Please enter the user Email Address or Alias here"
 Write-host
+Write-Host "Kindly confirm if you would like to remove permission including Subfolders [" -NoNewline; Write-Host "Y" -ForegroundColor Yellow -NoNewline; Write-Host "]Yes or [" -NoNewline; Write-Host "N" -ForegroundColor Yellow -NoNewline; Write-Host "]No"  -Fore Cyan -NoNewline;
+$subfolder = Read-Host " "
 
+if ($subfolder -eq "$null")
+{Write-Host "ERROR: Permission scope has not been confirmed!!!" -BackgroundColor black -ForegroundColor Yellow
+  Return
+  End
+  }
+
+Write-host
 Write-host "Below are the available options to remove permission on above mentioned Public Folder." -Fore DarkYellow
 Write-host "1. Author" -Fore DarkYellow
 Write-host "2. Reviewer" -Fore DarkYellow
-Write-host "3. PublishingEditor" -Fore DarkYellow
-Write-host "4. Editor" -Fore DarkYellow
-Write-host "5. Owner" -Fore DarkYellow
-$AR = Read-host "Please enter an option 1 to 5..."
-Write-host
-Write-host "Enter '1' for removing permission on subfolders and '2' for not removing permission on subfolders." -Fore Cyan
-Write-host "1. Yes" -Fore Cyan
-Write-host "2. No" -Fore Cyan
-$subfolder = Read-Host "Please enter 1 or 2..."
+Write-host "3. PublishingAuthor" -Fore DarkYellow
+Write-host "4. PublishingEditor" -Fore DarkYellow
+Write-host "5. Editor" -Fore DarkYellow
+Write-host "6. Owner" -Fore DarkYellow
+$AR = Read-host "Please enter an option 1 to 6..."
 
-
-if ($subfolder -eq "1")
+if ($subfolder -eq "Y")
 {
 Switch( $AR ){
   1{Get-PublicFolder –Identity “$PF” –Recurse | Remove-PublicFolderClientPermission –User "$U" –AccessRights "Author"}
   2{Get-PublicFolder –Identity “$PF” –Recurse | Remove-PublicFolderClientPermission –User "$U" –AccessRights "Reviewer"}
-  3{Get-PublicFolder –Identity “$PF” –Recurse | Remove-PublicFolderClientPermission –User "$U" –AccessRights "PublishingEditor"}
-  4{Get-PublicFolder –Identity “$PF” –Recurse | Remove-PublicFolderClientPermission –User "$U" –AccessRights "Editor"}
-  5{Get-PublicFolder –Identity “$PF” –Recurse | Remove-PublicFolderClientPermission –User "$U" –AccessRights "Owner"}
-
+  3{Get-PublicFolder –Identity “$PF” –Recurse | Remove-PublicFolderClientPermission –User "$U" –AccessRights "PublishingAuthor"}
+  4{Get-PublicFolder –Identity “$PF” –Recurse | Remove-PublicFolderClientPermission –User "$U" –AccessRights "PublishingEditor"}
+  5{Get-PublicFolder –Identity “$PF” –Recurse | Remove-PublicFolderClientPermission –User "$U" –AccessRights "Editor"}
+  6{Get-PublicFolder –Identity “$PF” –Recurse | Remove-PublicFolderClientPermission –User "$U" –AccessRights "Owner"}
+  default{Write-Host "ERROR: Permission level has not been selected for the above mentioned public folder!!!" -BackgroundColor black -ForegroundColor Yellow
+  Return
+  End
+  }
 }
 }
 
-if ($subfolder -eq "2")
+if ($subfolder -eq "N")
 {
 Switch( $AR ){
   1{Get-PublicFolder –Identity “$PF” | Remove-PublicFolderClientPermission –User "$U" –AccessRights "Author"}
   2{Get-PublicFolder –Identity “$PF” | Remove-PublicFolderClientPermission –User "$U" –AccessRights "Reviewer"}
-  3{Get-PublicFolder –Identity “$PF” | Remove-PublicFolderClientPermission –User "$U" –AccessRights "PublishingEditor"}
-  4{Get-PublicFolder –Identity “$PF” | Remove-PublicFolderClientPermission –User "$U" –AccessRights "Editor"}
-  5{Get-PublicFolder –Identity “$PF” | Remove-PublicFolderClientPermission –User "$U" –AccessRights "Owner"}
-
+  3{Get-PublicFolder –Identity “$PF” | Remove-PublicFolderClientPermission –User "$U" –AccessRights "PublishingAuthor"}
+  4{Get-PublicFolder –Identity “$PF” | Remove-PublicFolderClientPermission –User "$U" –AccessRights "PublishingEditor"}
+  5{Get-PublicFolder –Identity “$PF” | Remove-PublicFolderClientPermission –User "$U" –AccessRights "Editor"}
+  6{Get-PublicFolder –Identity “$PF” | Remove-PublicFolderClientPermission –User "$U" –AccessRights "Owner"}
+  default{Write-Host "ERROR: Permission level has not been selected for the above mentioned public folder!!!" -BackgroundColor black -ForegroundColor Yellow
+  Return
+  End
+  }
 }
 }
 
@@ -166,24 +175,23 @@ Else
 
 $PF = Read-Host "Please enter the Public Folder path under All Public Folders including preceding '\' sign"
 Write-host
-Write-host "Enter "1" for viewing permission on subfolders and "2" for not viewing permission on subfolders." -Fore Cyan
-Write-host "1. Yes" -Fore Cyan
-Write-host "2. No" -Fore Cyan
-$subfolder = Read-Host "Please enter 1 or 2..."
+Write-Host "Kindly confirm if you would like to apply permission including Subfolders [" -NoNewline; Write-Host "Y" -ForegroundColor Yellow -NoNewline; Write-Host "]Yes or [" -NoNewline; Write-Host "N" -ForegroundColor Yellow -NoNewline; Write-Host "]No"  -Fore Cyan -NoNewline;
+$subfolder = Read-Host " "
 
-if ($subfolder -eq "1")
+if ($subfolder -eq "$null")
+{Write-Host "ERROR: Permission scope has not been confirmed!!!" -BackgroundColor black -ForegroundColor Yellow
+  Return
+  End
+  }
+
+if ($subfolder -eq "Y")
 {
 Get-PublicFolder -Identity "$PF" –Recurse | Get-PublicFolderClientPermission | ft user,access* -Wrap
 }
 
-if ($subfolder -eq "2")
+if ($subfolder -eq "N")
 {
 Get-PublicFolder -Identity "$PF" | Get-PublicFolderClientPermission | ft user,access* -Wrap
-}
-
-if ($subfolder -eq "$null")
-{
-Write-Host "WARNING: Kindly enter 1 or 2 for viewing the current permission on the above mentioned public folder." -BackgroundColor black -ForegroundColor Yellow
 }
 }
 
@@ -224,13 +232,11 @@ End
 
 $PF = Read-Host "Please enter the Public Folder path under All Public Folders including preceding '\' sign"
 Write-host
-Write-host "Enter '1' for applying permission on subfolders and '2' for not applying permission on subfolders." -Fore Cyan
-Write-host "1. Yes" -Fore Cyan
-Write-host "2. No" -Fore Cyan
-$subfolder = Read-Host "Please enter 1 or 2..."
+Write-Host "Kindly confirm if you would like to apply permission including Subfolders [" -NoNewline; Write-Host "Y" -ForegroundColor Yellow -NoNewline; Write-Host "]Yes or [" -NoNewline; Write-Host "N" -ForegroundColor Yellow -NoNewline; Write-Host "]No"  -Fore Cyan -NoNewline;
+$subfolder = Read-Host " "
 
 if ($subfolder -eq "$null")
-{Write-Host "ERROR: Permission scope has not been selected!!!" -BackgroundColor black -ForegroundColor Yellow
+{Write-Host "ERROR: Permission scope has not been confirmed!!!" -BackgroundColor black -ForegroundColor Yellow
   Return
   End
   }
@@ -240,34 +246,37 @@ Write-host
 Write-host "Below are the available options to apply permission on above mentioned Public Folder." -Fore DarkYellow
 Write-host "1. Author" -Fore DarkYellow
 Write-host "2. Reviewer" -Fore DarkYellow
-Write-host "3. PublishingEditor" -Fore DarkYellow
-Write-host "4. Editor" -Fore DarkYellow
-Write-host "5. Owner" -Fore DarkYellow
-$AR = Read-host "Please enter an option 1 to 5..."
+Write-host "3. PublishingAuthor" -Fore DarkYellow
+Write-host "4. PublishingEditor" -Fore DarkYellow
+Write-host "5. Editor" -Fore DarkYellow
+Write-host "6. Owner" -Fore DarkYellow
+$AR = Read-host "Please enter an option 1 to 6..."
 
 
-if ($subfolder -eq "1")
+if ($subfolder -eq "Y")
 {
 Switch( $AR ){
   1{foreach ($line in $csv) {Get-PublicFolder –Identity “$PF” –Recurse | Add-PublicFolderClientPermission –User $line.sam –AccessRights "Author"}}
   2{foreach ($line in $csv) {Get-PublicFolder –Identity “$PF” –Recurse | Add-PublicFolderClientPermission –User $line.sam –AccessRights "Reviewer"}}
-  3{foreach ($line in $csv) {Get-PublicFolder –Identity “$PF” –Recurse | Add-PublicFolderClientPermission –User $line.sam –AccessRights "PublishingEditor"}}
-  4{foreach ($line in $csv) {Get-PublicFolder –Identity “$PF” –Recurse | Add-PublicFolderClientPermission –User $line.sam –AccessRights "Editor"}}
-  5{foreach ($line in $csv) {Get-PublicFolder –Identity “$PF” –Recurse | Add-PublicFolderClientPermission –User $line.sam –AccessRights "Owner"}}
+  3{foreach ($line in $csv) {Get-PublicFolder –Identity “$PF” –Recurse | Add-PublicFolderClientPermission –User $line.sam –AccessRights "PublishingAuthor"}}
+  4{foreach ($line in $csv) {Get-PublicFolder –Identity “$PF” –Recurse | Add-PublicFolderClientPermission –User $line.sam –AccessRights "PublishingEditor"}}
+  5{foreach ($line in $csv) {Get-PublicFolder –Identity “$PF” –Recurse | Add-PublicFolderClientPermission –User $line.sam –AccessRights "Editor"}}
+  6{foreach ($line in $csv) {Get-PublicFolder –Identity “$PF” –Recurse | Add-PublicFolderClientPermission –User $line.sam –AccessRights "Owner"}}
   default{Write-Host "ERROR: Permission level has not been selected for the above mentioned public folder!!!" -BackgroundColor black -ForegroundColor Yellow
   Return
   End
 }
 }}
 
-if ($subfolder -eq "2")
+if ($subfolder -eq "N")
 {
 Switch( $AR ){
   1{foreach ($line in $csv) {Get-PublicFolder –Identity “$PF” | Add-PublicFolderClientPermission –User $line.sam –AccessRights "Author"}}
   2{foreach ($line in $csv) {Get-PublicFolder –Identity “$PF” | Add-PublicFolderClientPermission –User $line.sam –AccessRights "Reviewer"}}
-  3{foreach ($line in $csv) {Get-PublicFolder –Identity “$PF” | Add-PublicFolderClientPermission –User $line.sam –AccessRights "PublishingEditor"}}
-  4{foreach ($line in $csv) {Get-PublicFolder –Identity “$PF” | Add-PublicFolderClientPermission –User $line.sam –AccessRights "Editor"}}
-  5{foreach ($line in $csv) {Get-PublicFolder –Identity “$PF” | Add-PublicFolderClientPermission –User $line.sam –AccessRights "Owner"}}
+  3{foreach ($line in $csv) {Get-PublicFolder –Identity “$PF” | Add-PublicFolderClientPermission –User $line.sam –AccessRights "PublishingAuthor"}}
+  4{foreach ($line in $csv) {Get-PublicFolder –Identity “$PF” | Add-PublicFolderClientPermission –User $line.sam –AccessRights "PublishingEditor"}}
+  5{foreach ($line in $csv) {Get-PublicFolder –Identity “$PF” | Add-PublicFolderClientPermission –User $line.sam –AccessRights "Editor"}}
+  6{foreach ($line in $csv) {Get-PublicFolder –Identity “$PF” | Add-PublicFolderClientPermission –User $line.sam –AccessRights "Owner"}}
   default{Write-Host "ERROR: Permission level has not been selected for the above mentioned public folder!!!" -BackgroundColor black -ForegroundColor Yellow
   Return
   End
@@ -296,4 +305,3 @@ Switch( $call ){
   3{View}
   4{AddBulk}
 }
-#Please share your feedback @ sumitadmin@gmail.com
