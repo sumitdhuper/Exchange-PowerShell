@@ -13,13 +13,14 @@ Display information about a given mailbox and output to console.
 The MAILBOX parameter could be used by administrator to display information about specified mailbox.
 
 .PARAMETER Prompt
-The PROMPT parameter could be used to run text input prompt messages to display information about specified mailbox.
+The PROMPT parameter could be used to display multiple text input prompt messages to display information about specified mailbox.
 
 .PARAMETER Log
 Used to generate a log file for the script.
 
 .EXAMPLE
 Get-Help .\Get-MailboxInfo.ps1 -Full
+Returns full details about script usage method including parameters, syntax and examples.
 
 .EXAMPLE
 .\Get-MailboxInfo.ps1 -Prompt
@@ -65,6 +66,7 @@ Change Log:
 V1.00, 09/07/2015 - Initial version
 V1.01, 14/08/2015 - Added Mailbox Parameter which is mandatory, Added Log file generation function and updated color codes
 V1.02, 18/08/2015 - Added Prompt Parameter which is optional function enabled helpdesk admin to run script through text input prompts.
+V1.03, 22/12/2015 - Added Mailbox Quota Limit update function.
 #>
 
 #requires -version 2
@@ -193,20 +195,24 @@ Import-Module ActiveDirectory -ErrorAction STOP
 If($Mailbox)
 {
 
+$sam = (Get-Mailbox $Mailbox).SamAccountName
+$ou = (Get-Mailbox $Mailbox).Identity
 $Email = (Get-Mailbox $Mailbox).PrimarySmtpAddress
 $db = (Get-Mailbox $Mailbox).database
 $quota = (Get-Mailbox $Mailbox).UseDatabaseQuotaDefaults
-(Get-Mailbox $Mailbox | Get-MailboxStatistics | Add-Member -MemberType ScriptProperty -Name TotalItemSizeinMB -Value{$this.totalitemsize.value.ToMB()} -PassThru | Format-List DisplayName,TotalItemSizeinMB | Out-String).Trim()
+(Get-Mailbox $Mailbox | Get-MailboxStatistics | Add-Member -MemberType ScriptProperty -Name TotalItemSizeinMB -Value
+
+{$this.totalitemsize.value.ToMB()} -PassThru | Format-List DisplayName,TotalItemSizeinMB | Out-String).Trim()
+Write-Host "Login Account ID :" $sam
 Write-Host "PrimaryEmailAddress :" $Email
+Write-Host "Organizational Unit: " $ou
 (Get-MailboxStatistics $Mailbox | Format-List Database,ItemCount,StorageLimitStatus,LastLogonTime | Out-String).Trim()
 
 if ($quota -eq "true")
-  {(Get-MailboxDatabase "$db" | Format-List ProhibitSendQuota,IssueWarningQuota | Out-String).Trim()
+  {(Get-MailboxDatabase "$db" | Format-List ProhibitSendQuota,IssueWarningQuota,ProhibitSendReceiveQuota | Out-String).Trim()
 
 Write-Host "Note: Mailbox Quota Limit is getting inherited from Database." -fore DarkBlue -back Cyan
 Write-Host "-----------------------------------------------------------" -fore Yellow
-Return
-End
 }
 
 Else
@@ -215,8 +221,6 @@ Else
 
 Write-Host "Note: Mailbox Quota Limit is applied on user's Mailbox." -fore DarkBlue -back Cyan
 Write-Host "-------------------------------------------------------" -fore Yellow
-Return
-End
 }
 
 }
@@ -227,7 +231,9 @@ Write-Host "   This script will show the mailbox details for user's mailbox" -fo
 Write-Host "******************************************************************" -fore Yellow
 Write-Host
 $Random = Get-Random -Maximum 1000 -Minimum 101
-Write-Host "Please enter this verification code " -NoNewline; Write-Host " $Random " -ForegroundColor Black -BackgroundColor Yellow -NoNewline; Write-Host " to continue on this Script."
+Write-Host "Please enter this verification code " -NoNewline; Write-Host " $Random " -ForegroundColor Black -BackgroundColor Yellow -NoNewline; 
+
+Write-Host " to continue on this Script."
 $Code = Read-Host "Enter the verification Code as showing above"
 
 if ($Random -eq "$Code")
@@ -238,34 +244,100 @@ Else
     Return
     End}
 Write-Host
-$user = Read-Host "Please enter user Alias or Email Address"
+$Mailbox = Read-Host "Please enter user Alias or Email Address"
 Write-Host
-$Email = (Get-Mailbox $user).PrimarySmtpAddress
-$db = (Get-Mailbox $user).database
-$quota = (Get-Mailbox $user).UseDatabaseQuotaDefaults
-(Get-Mailbox $user | Get-MailboxStatistics | Add-Member -MemberType ScriptProperty -Name TotalItemSizeinMB -Value{$this.totalitemsize.value.ToMB()} -PassThru | Format-List DisplayName,TotalItemSizeinMB | Out-String).Trim()
+$sam = (Get-Mailbox $Mailbox).SamAccountName
+$Email = (Get-Mailbox $Mailbox).PrimarySmtpAddress
+$db = (Get-Mailbox $Mailbox).database
+$quota = (Get-Mailbox $Mailbox).UseDatabaseQuotaDefaults
+(Get-Mailbox $Mailbox | Get-MailboxStatistics | Add-Member -MemberType ScriptProperty -Name TotalItemSizeinMB -Value
+
+{$this.totalitemsize.value.ToMB()} -PassThru | Format-List DisplayName,TotalItemSizeinMB | Out-String).Trim()
+Write-Host "Login Account ID :" $sam
 Write-Host "PrimaryEmailAddress :" $Email
-(Get-MailboxStatistics $user | Format-List Database,ItemCount,StorageLimitStatus,LastLogonTime | Out-String).Trim()
+(Get-MailboxStatistics $Mailbox | Format-List Database,ItemCount,StorageLimitStatus,LastLogonTime | Out-String).Trim()
 
 if ($quota -eq "true")
-  {(Get-MailboxDatabase "$db" | Format-List ProhibitSendQuota,IssueWarningQuota | Out-String).Trim()
+  {(Get-MailboxDatabase "$db" | Format-List ProhibitSendQuota,IssueWarningQuota,ProhibitSendReceiveQuota | Out-String).Trim()
 
 Write-Host "Note: Mailbox Quota Limit is getting inherited from Database." -fore DarkBlue -back Cyan
 Write-Host "-----------------------------------------------------------" -fore Yellow
-Return
-End
 }
 
 Else
   {
-(Get-Mailbox $user | Format-List ProhibitSendQuota, IssueWarningQuota | Out-String).Trim()
+(Get-Mailbox $Mailbox | Format-List ProhibitSendQuota,IssueWarningQuota,ProhibitSendReceiveQuota  | Out-String).Trim()
 
 Write-Host "Note: Mailbox Quota Limit is applied on user's Mailbox." -fore DarkBlue -back Cyan
 Write-Host "-------------------------------------------------------" -fore Yellow
-Return
-End
 }
 }
+
+if(!$Mailbox)
+{Write-Host $initstring3 -ForegroundColor Yellow -BackgroundColor Black
+    Return
+    End}
+
+$update = Read-Host "Please confirm if you would like to update mailbox quota settings on this mailbox ( type Y or N)"
+
+if ($update -ne "Y")
+    {Write-Host "No update has been done on mailbox quota settings!!!" -ForegroundColor Yellow -BackgroundColor Black
+    Return
+    End}
+
+if ($update -eq "Y")
+{
+$DefaultQuota = Read-Host "Please confirm if you want mailbox quota settings to be set as default inherited from Mailbox Database (type Y or N)"
+
+if($DefaultQuota -eq "Y")
+{
+Set-Mailbox -Identity $Mailbox -ProhibitSendQuota Unlimited -IssueWarningQuota Unlimited -ProhibitSendReceiveQuota Unlimited -
+
+UseDatabaseQuotaDefaults $true
+    
+    Write-Host "Mailbox Quota Settings has been updated now!!!"
+    Return
+    End
+}
+
+if($DefaultQuota -eq "N")
+{
+$SendLimit = Read-Host "Provide value for Prohibit Send Quota Limit in MB (MegaBytes) on mailbox"
+$WarningLimit = Read-Host "Provide value for Issue Warning Quota Limit in MB (MegaBytes) on mailbox"
+
+if(!$SendLimit -or !$WarningLimit)
+    {Write-Host "No update has been done on mailbox quota settings!!!" -ForegroundColor Yellow -BackgroundColor Black
+    Return
+    End}
+
+Write-Host
+$Random = Get-Random -Maximum 1000 -Minimum 101
+Write-Host "Please enter this verification code " -NoNewline; Write-Host " $Random " -ForegroundColor Black -BackgroundColor Yellow -NoNewline; 
+
+Write-Host " to continue on this Script."
+$Code = Read-Host "Enter the verification Code as showing above"
+
+if ($Random -eq "$Code")
+{Write-Host "Code has been verified successfully!!!" -ForegroundColor Green}
+
+Else
+    {Write-Host "ERROR: Verification Failed!!! Kindly run the Script again." -ForegroundColor Yellow -BackgroundColor Black
+    Return
+    End}
+
+Set-Mailbox -Identity $mailbox -ProhibitSendQuota $SendLimit -IssueWarningQuota $WarningLimit -UseDatabaseQuotaDefaults $false
+
+    Write-Host "Mailbox Quota Settings has been updated now!!!"
+    Return
+    End}
+
+if(!$DefaultQuota)
+    {Write-Host "No update has been done on mailbox quota settings!!!" -ForegroundColor Yellow -BackgroundColor Black
+    Return
+    End}
+    }
+    
+
 #...................................
 # End
 #...................................
@@ -277,5 +349,3 @@ if ($Log) {
 	Write-Logfile "  $now"
 	Write-Logfile $logstring0
 }
-
-Write-Host $initstring3 -ForegroundColor Yellow -BackgroundColor Black
